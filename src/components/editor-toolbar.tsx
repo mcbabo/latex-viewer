@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,7 +27,22 @@ interface EditorToolbarProps {
   onInsert: (text: string) => void;
 }
 
-export function EditorToolbar({ onInsert }: EditorToolbarProps) {
+const GREEK_LETTERS: [string, string][] = [
+  ["\\alpha", "alpha"],
+  ["\\beta", "beta"],
+  ["\\gamma", "gamma"],
+  ["\\delta", "delta"],
+  ["\\epsilon", "eps"],
+  ["\\theta", "theta"],
+  ["\\lambda", "lambda"],
+  ["\\mu", "mu"],
+  ["\\pi", "pi"],
+  ["\\sigma", "sigma"],
+  ["\\phi", "phi"],
+  ["\\omega", "omega"],
+];
+
+export const EditorToolbar = memo(function EditorToolbar({ onInsert }: EditorToolbarProps) {
   return (
     <div className="flex items-center gap-1 px-2 py-1.5 bg-muted/50 border-b border-border overflow-x-auto">
       <Button
@@ -150,20 +166,7 @@ export function EditorToolbar({ onInsert }: EditorToolbarProps) {
         <DropdownMenuContent align="start" className="w-40">
           <DropdownMenuLabel className="text-xs">Greek Letters</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 p-1">
-            {[
-              ["\\alpha", "alpha"],
-              ["\\beta", "beta"],
-              ["\\gamma", "gamma"],
-              ["\\delta", "delta"],
-              ["\\epsilon", "eps"],
-              ["\\theta", "theta"],
-              ["\\lambda", "lambda"],
-              ["\\mu", "mu"],
-              ["\\pi", "pi"],
-              ["\\sigma", "sigma"],
-              ["\\phi", "phi"],
-              ["\\omega", "omega"],
-            ].map(([cmd, label]) => (
+            {GREEK_LETTERS.map(([cmd, label]) => (
               <Button
                 key={cmd}
                 variant="ghost"
@@ -214,4 +217,4 @@ export function EditorToolbar({ onInsert }: EditorToolbarProps) {
       </DropdownMenu>
     </div>
   );
-}
+});

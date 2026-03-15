@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useCallback, useEffect } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
-import type { editor } from "monaco-editor";
+import type { editor, Selection, Position } from "monaco-editor";
 import { useTheme } from "next-themes";
 import { invoke } from "@tauri-apps/api/core";
 import snippetData from "@/data/latex-snippets.json";
@@ -20,13 +20,39 @@ export interface LatexEditorHandle {
 // Guard: Monaco globals (language, completions, formatter) are registered once per app lifetime
 let monacoInitialized = false;
 
+const EDITOR_OPTIONS = {
+  fontSize: 14,
+  fontFamily: "'Geist Mono', 'Fira Code', 'Consolas', monospace",
+  lineNumbers: "on",
+  minimap: { enabled: false },
+  scrollBeyondLastLine: false,
+  wordWrap: "on",
+  automaticLayout: true,
+  tabSize: 2,
+  insertSpaces: true,
+  renderWhitespace: "selection",
+  bracketPairColorization: { enabled: true },
+  padding: { top: 12, bottom: 12 },
+  lineHeight: 22,
+  cursorBlinking: "smooth",
+  cursorSmoothCaretAnimation: "on",
+  smoothScrolling: true,
+  folding: true,
+  foldingHighlight: true,
+  showFoldingControls: "mouseover",
+  renderLineHighlight: "line",
+  guides: { indentation: true, bracketPairs: true },
+  formatOnPaste: true,
+  suggest: { showSnippets: true, showKeywords: true },
+} as const;
+
 export const LatexEditor = forwardRef<LatexEditorHandle, LatexEditorProps>(
   function LatexEditor({ value, onChange, onSave, className }, ref) {
     const { resolvedTheme } = useTheme();
     const monacoTheme = resolvedTheme === "light" ? "latex-light" : "latex-dark";
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
     // Tracks the last known selection so toolbar inserts work after focus loss
-    const selectionRef = useRef<editor.Selection | null>(null);
+    const selectionRef = useRef<Selection | null>(null);
     // Ref keeps the save callback fresh inside the Monaco command handler
     const onSaveRef = useRef<(() => void) | undefined>(onSave);
     useEffect(() => { onSaveRef.current = onSave; }, [onSave]);
@@ -119,7 +145,7 @@ export const LatexEditor = forwardRef<LatexEditorHandle, LatexEditorProps>(
               // Snippet completions triggered by backslash
               monaco.languages.registerCompletionItemProvider("latex", {
                 triggerCharacters: ["\\"],
-                provideCompletionItems(model, position) {
+                provideCompletionItems(model: editor.ITextModel, position: Position) {
                   const textUntilPosition = model.getValueInRange({
                     startLineNumber: position.lineNumber,
                     startColumn: 1,
@@ -149,7 +175,7 @@ export const LatexEditor = forwardRef<LatexEditorHandle, LatexEditorProps>(
               });
 
               monaco.languages.registerDocumentFormattingEditProvider("latex", {
-                async provideDocumentFormattingEdits(model) {
+                async provideDocumentFormattingEdits(model: editor.ITextModel) {
                   try {
                     const formatted = await invoke<string>("format_latex", {
                       content: model.getValue(),
@@ -216,31 +242,7 @@ export const LatexEditor = forwardRef<LatexEditorHandle, LatexEditorProps>(
               },
             });
           }}
-          options={{
-            fontSize: 14,
-            fontFamily: "'Geist Mono', 'Fira Code', 'Consolas', monospace",
-            lineNumbers: "on",
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            automaticLayout: true,
-            tabSize: 2,
-            insertSpaces: true,
-            renderWhitespace: "selection",
-            bracketPairColorization: { enabled: true },
-            padding: { top: 12, bottom: 12 },
-            lineHeight: 22,
-            cursorBlinking: "smooth",
-            cursorSmoothCaretAnimation: "on",
-            smoothScrolling: true,
-            folding: true,
-            foldingHighlight: true,
-            showFoldingControls: "mouseover",
-            renderLineHighlight: "line",
-            guides: { indentation: true, bracketPairs: true },
-            formatOnPaste: true,
-            suggest: { showSnippets: true, showKeywords: true },
-          }}
+          options={EDITOR_OPTIONS}
         />
       </div>
     );

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +21,6 @@ export interface LogEntry {
 interface LogPanelProps {
     logs: LogEntry[];
     onClear: () => void;
-    isOpen: boolean;
-    onToggle: () => void;
 }
 
 function EntryIcon({ type }: { type: LogEntry["type"] }) {
@@ -32,8 +30,10 @@ function EntryIcon({ type }: { type: LogEntry["type"] }) {
     return <Info className="h-3 w-3 text-blue-400 shrink-0 mt-0.5" />;
 }
 
-export function LogPanel({ logs, onClear, isOpen, onToggle }: LogPanelProps) {
+export function LogPanel({ logs, onClear }: LogPanelProps) {
+    const [isOpen, setIsOpen] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const errorCount = useMemo(() => logs.filter(l => l.type === "error").length, [logs]);
 
     useEffect(() => {
         if (isOpen && scrollRef.current) {
@@ -41,12 +41,10 @@ export function LogPanel({ logs, onClear, isOpen, onToggle }: LogPanelProps) {
         }
     }, [logs, isOpen]);
 
-    const errorCount = logs.filter(l => l.type === "error").length;
-
     return (
         <div className="border-t border-border bg-card flex flex-col shrink-0">
             <button
-                onClick={onToggle}
+                onClick={() => setIsOpen(prev => !prev)}
                 className="flex items-center justify-between px-3 h-7 hover:bg-muted/50 w-full"
             >
                 <div className="flex items-center gap-2">

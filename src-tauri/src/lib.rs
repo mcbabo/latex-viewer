@@ -52,6 +52,7 @@ fn compile_latex(
             .to_string_lossy()
             .to_string())
     } else {
+        // pdflatex writes its full diagnostic log (including errors) to stdout.
         let stdout = String::from_utf8_lossy(&output.stdout).to_string();
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         Err(if !stdout.is_empty() { stdout } else { stderr })
@@ -87,11 +88,9 @@ fn read_directory(path: String) -> Result<Vec<FileEntry>, String> {
             });
         }
     }
-    result.sort_by(|a, b| {
-        b.is_dir
-            .cmp(&a.is_dir)
-            .then(a.name.to_lowercase().cmp(&b.name.to_lowercase()))
-    });
+    // Directories first, then case-insensitive alphabetical.
+    // sort_by_key computes the key once per element, avoiding repeated allocations.
+    result.sort_by_key(|e| (!e.is_dir, e.name.to_lowercase()));
     Ok(result)
 }
 
@@ -120,7 +119,7 @@ fn format_latex(content: String) -> Result<String, String> {
     child
         .stdin
         .take()
-        .unwrap()
+        .ok_or_else(|| "failed to capture stdin".to_string())?
         .write_all(content.as_bytes())
         .map_err(|e| e.to_string())?;
 
@@ -129,6 +128,7 @@ fn format_latex(content: String) -> Result<String, String> {
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     } else {
+        // latexindent writes its error details to stderr (intentionally different from compile_latex).
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         let stdout = String::from_utf8_lossy(&output.stdout).to_string();
         Err(if !stderr.is_empty() { stderr } else { stdout })

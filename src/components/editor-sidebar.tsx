@@ -46,6 +46,10 @@ export interface EditorSidebarProps {
 
 // ── Parsers ────────────────────────────────────────────────────────────────
 
+function getExtension(name: string): string {
+    return name.split(".").pop()?.toLowerCase() ?? "";
+}
+
 const HEADING_LEVELS: Record<string, number> = {
     chapter: 0,
     section: 1,
@@ -54,9 +58,8 @@ const HEADING_LEVELS: Record<string, number> = {
     paragraph: 4,
 };
 
-function parseOutline(content: string): OutlineItem[] {
+function parseOutline(lines: string[]): OutlineItem[] {
     const items: OutlineItem[] = [];
-    const lines = content.split("\n");
     // matches \section*{Title} or \section{Title with {nested} braces}
     const re = /^[^%]*\\(chapter|section|subsection|subsubsection|paragraph)\*?\s*\{([^}]*)\}/;
     for (let i = 0; i < lines.length; i++) {
@@ -68,9 +71,8 @@ function parseOutline(content: string): OutlineItem[] {
     return items;
 }
 
-function parsePackages(content: string): string[] {
+function parsePackages(lines: string[]): string[] {
     const packages: string[] = [];
-    const lines = content.split("\n");
     const re = /^[^%]*\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/;
     for (const line of lines) {
         const m = line.match(re);
@@ -99,7 +101,7 @@ function OutlineIcon({ level }: { level: number }) {
 const TEXT_EXTENSIONS = new Set(["tex", "bib", "txt", "sty", "cls", "cfg", "def", "md"]);
 
 function fileIcon(name: string) {
-    const ext = name.split(".").pop()?.toLowerCase() ?? "";
+    const ext = getExtension(name);
     if (ext === "tex") return <FileCode className="h-3.5 w-3.5 mr-1.5 text-primary shrink-0" />;
     if (ext === "bib") return <BookOpen className="h-3.5 w-3.5 mr-1.5 text-yellow-400 shrink-0" />;
     if (ext === "pdf") return <FileText className="h-3.5 w-3.5 mr-1.5 text-red-400 shrink-0" />;
@@ -143,8 +145,7 @@ function FileTree({
     };
 
     const handleFileClick = async (entry: FsEntry) => {
-        const ext = entry.name.split(".").pop()?.toLowerCase() ?? "";
-        if (!TEXT_EXTENSIONS.has(ext)) return;
+        if (!TEXT_EXTENSIONS.has(getExtension(entry.name))) return;
         try {
             const content = await invoke<string>("read_file_content", { path: entry.path });
             onFileOpen(content, entry.path);
@@ -206,7 +207,7 @@ function FileTree({
                                 activeFilePath === entry.path
                                     ? "bg-accent text-accent-foreground"
                                     : "text-foreground",
-                                !TEXT_EXTENSIONS.has(entry.name.split(".").pop()?.toLowerCase() ?? "")
+                                !TEXT_EXTENSIONS.has(getExtension(entry.name))
                                 && "opacity-50 cursor-default"
                             )}
                             style={{ paddingLeft: `${depth * 12 + 20}px` }}
@@ -235,14 +236,15 @@ export function EditorSidebar({
     const [rootName, setRootName] = useState<string | null>(null);
     const [loadingRoot, setLoadingRoot] = useState(false);
 
-    const outline = useMemo(() => parseOutline(content), [content]);
-    const packages = useMemo(() => parsePackages(content), [content]);
+    const lines = useMemo(() => content.split("\n"), [content]);
+    const outline = useMemo(() => parseOutline(lines), [lines]);
+    const packages = useMemo(() => parsePackages(lines), [lines]);
 
     const handleOpenFolder = async () => {
         try {
             const selected = await openDialog({ directory: true, multiple: false });
-            if (!selected) return;
-            const folderPath = selected as string;
+            if (typeof selected !== "string") return;
+            const folderPath = selected;
             setLoadingRoot(true);
             const entries = await invoke<FsEntry[]>("read_directory", { path: folderPath });
             setRootName(folderPath.split(/[\\/]/).pop() ?? folderPath);
@@ -349,9 +351,9 @@ export function EditorSidebar({
                                 </p>
                             ) : (
                                 <div>
-                                    {outline.map((item, i) => (
+                                    {outline.map((item) => (
                                         <button
-                                            key={i}
+                                            key={`${item.level}-${item.line}`}
                                             onClick={() => onScrollToLine(item.line)}
                                             className="flex items-center gap-1.5 w-full h-7 text-xs hover:bg-accent/50 rounded-sm text-foreground"
                                             style={{ paddingLeft: `${item.level * 12 + 6}px` }}

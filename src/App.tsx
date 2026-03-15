@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { appLocalDataDir, join, dirname } from "@tauri-apps/api/path";
-import { cn } from "@/lib/utils";
+import { cn, getFilename, formatError } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   ResizablePanelGroup,
@@ -47,17 +47,51 @@ export default function App() {
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
   const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [logsOpen, setLogsOpen] = useState(true);
   const prevPdfUrl = useRef<string | null>(null);
   const editorRef = useRef<LatexEditorHandle>(null);
   const logId = useRef(0);
   const lastSavedContent = useRef<string>("");
   const fileStateRef = useRef<Map<string, FileState>>(new Map());
+  // Tracks latest editor content synchronously — avoids stale closures in callbacks
+  const contentRef = useRef("");
+  // Cached output dir — resolved once, never changes at runtime
+  const outputDirRef = useRef<string | null>(null);
+
+  // Keep contentRef in sync on every editor change
+  const handleContentChange = useCallback((val: string) => {
+    contentRef.current = val;
+    setContent(val);
+  }, []);
 
   const addLog = useCallback((type: LogEntry["type"], message: string) => {
     const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     setLogs(prev => [...prev, { id: ++logId.current, type, message, timestamp: ts }]);
   }, []);
+
+  // Resolves and caches the app's output directory (IPC call runs at most once)
+  const getOutputDir = useCallback(async (): Promise<string> => {
+    if (!outputDirRef.current) {
+      outputDirRef.current = await join(await appLocalDataDir(), "latex-viewer");
+    }
+    return outputDirRef.current;
+  }, []);
+
+  // Deduplicates the Blob-URL creation + revocation + state update pattern
+  const setPdfFromBytes = useCallback((bytes: number[]) => {
+    const blob = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    if (prevPdfUrl.current) URL.revokeObjectURL(prevPdfUrl.current);
+    prevPdfUrl.current = url;
+    setPdfUrl(url);
+    setCompileError(null);
+  }, []);
+
+  // Flushes the current in-memory editor content into fileStateRef before a tab switch
+  const flushContent = useCallback(() => {
+    if (!activeFilePath) return;
+    const cur = fileStateRef.current.get(activeFilePath);
+    if (cur) cur.content = contentRef.current;
+  }, [activeFilePath]);
 
   const handleScrollToLine = useCallback((line: number) => {
     editorRef.current?.scrollToLine(line);
@@ -69,32 +103,22 @@ export default function App() {
 
   const loadCachedPdf = useCallback(async (path: string) => {
     try {
-      const outputDir = await join(await appLocalDataDir(), "latex-viewer");
+      const outputDir = await getOutputDir();
       const cached = await invoke<number[] | null>("get_cached_pdf", { sourcePath: path, outputDir });
       if (cached) {
-        const blob = new Blob([new Uint8Array(cached)], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        if (prevPdfUrl.current) URL.revokeObjectURL(prevPdfUrl.current);
-        prevPdfUrl.current = url;
-        setPdfUrl(url);
-        setCompileError(null);
+        setPdfFromBytes(cached);
         return true;
       }
       setPdfUrl(null);
-      setCompileError(null);
       return false;
     } catch {
       setPdfUrl(null);
       return false;
     }
-  }, []);
+  }, [getOutputDir, setPdfFromBytes]);
 
   const handleFileOpen = useCallback(async (fileContent: string, path: string) => {
-    // Flush current in-memory content before switching
-    if (activeFilePath) {
-      const cur = fileStateRef.current.get(activeFilePath);
-      if (cur) cur.content = content;
-    }
+    flushContent();
 
     const isNew = !fileStateRef.current.has(path);
     if (isNew) {
@@ -103,35 +127,34 @@ export default function App() {
 
     const state = fileStateRef.current.get(path)!;
     setOpenFiles(prev => prev.includes(path) ? prev : [...prev, path]);
+    contentRef.current = state.content;
     setContent(state.content);
     setActiveFilePath(path);
+    setCompileError(null);
     lastSavedContent.current = state.saved;
 
     if (isNew) {
-      addLog("info", `Opened ${path.split(/[\\/]/).pop() ?? path}`);
+      addLog("info", `Opened ${getFilename(path)}`);
       const hadCache = await loadCachedPdf(path);
       if (hadCache) addLog("info", "Loaded cached PDF");
     } else {
       await loadCachedPdf(path);
     }
-  }, [activeFilePath, content, addLog, loadCachedPdf]);
+  }, [flushContent, addLog, loadCachedPdf]);
 
   const handleTabSwitch = useCallback(async (path: string) => {
     if (path === activeFilePath) return;
     const fileState = fileStateRef.current.get(path);
     if (!fileState) return;
 
-    // Flush current content
-    if (activeFilePath) {
-      const cur = fileStateRef.current.get(activeFilePath);
-      if (cur) cur.content = content;
-    }
-
+    flushContent();
+    contentRef.current = fileState.content;
     setContent(fileState.content);
     setActiveFilePath(path);
+    setCompileError(null);
     lastSavedContent.current = fileState.saved;
     await loadCachedPdf(path);
-  }, [activeFilePath, content, loadCachedPdf]);
+  }, [activeFilePath, flushContent, loadCachedPdf]);
 
   const handleTabClose = useCallback((path: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -142,13 +165,16 @@ export default function App() {
     if (path === activeFilePath) {
       if (next.length === 0) {
         setActiveFilePath(null);
+        contentRef.current = "";
         setContent("");
         setPdfUrl(null);
+        setCompileError(null);
         lastSavedContent.current = "";
       } else {
         const idx = openFiles.indexOf(path);
         const newPath = next[Math.min(idx, next.length - 1)];
         const newState = fileStateRef.current.get(newPath)!;
+        contentRef.current = newState.content;
         setContent(newState.content);
         setActiveFilePath(newPath);
         lastSavedContent.current = newState.saved;
@@ -160,48 +186,53 @@ export default function App() {
   const handleSave = useCallback(async () => {
     if (!activeFilePath) return;
     try {
-      await invoke("write_file_content", { path: activeFilePath, content });
-      lastSavedContent.current = content;
+      await invoke("write_file_content", { path: activeFilePath, content: contentRef.current });
+      lastSavedContent.current = contentRef.current;
       const state = fileStateRef.current.get(activeFilePath);
-      if (state) state.saved = content;
-      addLog("success", `Saved ${activeFilePath.split(/[\\/]/).pop()}`);
+      if (state) state.saved = contentRef.current;
+      addLog("success", `Saved ${getFilename(activeFilePath)}`);
     } catch (err) {
-      addLog("error", typeof err === "string" ? err : "Failed to save file");
+      addLog("error", formatError(err, "Failed to save file"));
     }
-  }, [activeFilePath, content, addLog]);
+  }, [activeFilePath, addLog]);
 
   const handleCompile = useCallback(async () => {
     setIsCompiling(true);
     setCompileError(null);
-    addLog("info", `Compiling ${activeFilePath?.split(/[\\/]/).pop() ?? "file"}...`);
+    addLog("info", `Compiling ${getFilename(activeFilePath ?? "file")}...`);
     try {
-      const outputDir = await join(await appLocalDataDir(), "latex-viewer");
-      const sourceDir = await dirname(activeFilePath!);
+      const [outputDir, sourceDir] = await Promise.all([
+        getOutputDir(),
+        dirname(activeFilePath!),
+      ]);
       const pdfPath = await invoke<string>("compile_latex", {
-        texContent: content,
+        texContent: contentRef.current,
         outputDir,
         sourceDir,
         sourcePath: activeFilePath!,
       });
       const pdfBytes = await invoke<number[]>("get_pdf_bytes", { pdfPath });
-      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      if (prevPdfUrl.current) URL.revokeObjectURL(prevPdfUrl.current);
-      prevPdfUrl.current = url;
-      setPdfUrl(url);
+      setPdfFromBytes(pdfBytes);
       addLog("success", "Compilation successful — PDF ready");
     } catch (err) {
-      const msg = typeof err === "string" ? err : err instanceof Error ? err.message : "Failed to compile LaTeX";
+      const msg = formatError(err, "Failed to compile LaTeX");
       setCompileError(msg);
       addLog("error", msg);
     } finally {
       setIsCompiling(false);
     }
-  }, [content, activeFilePath, addLog]);
+  }, [activeFilePath, addLog, getOutputDir, setPdfFromBytes]);
 
   const isDirty = activeFilePath !== null && content !== lastSavedContent.current;
-  const lines = content.split("\n").length;
-  const chars = content.length;
+  const { lines, chars } = useMemo(
+    () => ({ lines: content.split("\n").length, chars: content.length }),
+    [content]
+  );
+
+  // Single editor node shared between "editor" and "split" view modes
+  const editorNode = activeFilePath
+    ? <LatexEditor ref={editorRef} key={activeFilePath} value={content} onChange={handleContentChange} onSave={handleSave} className="h-full" />
+    : <EmptyEditorState />;
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
@@ -213,7 +244,7 @@ export default function App() {
           <Separator orientation="vertical" />
           <FileText className="h-4 w-4 text-primary" />
           <span className="font-medium text-sm">
-            {activeFilePath ? activeFilePath.split(/[\\/]/).pop() : "document.tex"}
+            {activeFilePath ? getFilename(activeFilePath) : "document.tex"}
             {isDirty && <span className="text-primary ml-1 leading-none">●</span>}
           </span>
         </div>
@@ -273,7 +304,7 @@ export default function App() {
           {openFiles.length > 0 && (
             <div className="flex border-b border-border bg-card overflow-x-auto shrink-0 min-h-9">
               {openFiles.map(path => {
-                const name = path.split(/[\\/]/).pop() ?? path;
+                const name = getFilename(path);
                 const isActive = path === activeFilePath;
                 const state = fileStateRef.current.get(path);
                 const tabDirty = isActive
@@ -311,21 +342,14 @@ export default function App() {
           {viewMode !== "preview" && <EditorToolbar onInsert={handleInsert} />}
 
           <div className="flex-1 overflow-hidden">
-            {viewMode === "editor" && (
-              activeFilePath
-                ? <LatexEditor ref={editorRef} key={activeFilePath} value={content} onChange={setContent} onSave={handleSave} className="h-full" />
-                : <EmptyEditorState />
-            )}
+            {viewMode === "editor" && editorNode}
             {viewMode === "preview" && (
               <PdfPreview pdfUrl={pdfUrl} isCompiling={isCompiling} error={compileError} className="h-full" />
             )}
             {viewMode === "split" && (
               <ResizablePanelGroup orientation="horizontal">
                 <ResizablePanel defaultSize={50} minSize={30}>
-                  {activeFilePath
-                    ? <LatexEditor ref={editorRef} key={activeFilePath} value={content} onChange={setContent} onSave={handleSave} className="h-full" />
-                    : <EmptyEditorState />
-                  }
+                  {editorNode}
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={50} minSize={30}>
@@ -338,8 +362,6 @@ export default function App() {
           <LogPanel
             logs={logs}
             onClear={() => setLogs([])}
-            isOpen={logsOpen}
-            onToggle={() => setLogsOpen(prev => !prev)}
           />
 
           <div className="flex items-center justify-between h-6 px-3 bg-muted/50 border-t border-border text-[10px] text-muted-foreground">
