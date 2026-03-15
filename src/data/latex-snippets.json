@@ -1,0 +1,627 @@
+[
+  {
+    "label": "\\textbf",
+    "insert": "\\textbf{$1}$0",
+    "detail": "Bold"
+  },
+  {
+    "label": "\\textit",
+    "insert": "\\textit{$1}$0",
+    "detail": "Italic"
+  },
+  {
+    "label": "\\underline",
+    "insert": "\\underline{$1}$0",
+    "detail": "Underline"
+  },
+  {
+    "label": "\\texttt",
+    "insert": "\\texttt{$1}$0",
+    "detail": "Monospace"
+  },
+  {
+    "label": "\\emph",
+    "insert": "\\emph{$1}$0",
+    "detail": "Emphasis"
+  },
+  {
+    "label": "\\text",
+    "insert": "\\text{$1}$0",
+    "detail": "Text in math"
+  },
+  {
+    "label": "\\textsuperscript",
+    "insert": "\\textsuperscript{$1}$0",
+    "detail": "Superscript"
+  },
+  {
+    "label": "\\textsubscript",
+    "insert": "\\textsubscript{$1}$0",
+    "detail": "Subscript"
+  },
+  {
+    "label": "\\section",
+    "insert": "\\section{$1}$0",
+    "detail": "Section"
+  },
+  {
+    "label": "\\subsection",
+    "insert": "\\subsection{$1}$0",
+    "detail": "Subsection"
+  },
+  {
+    "label": "\\subsubsection",
+    "insert": "\\subsubsection{$1}$0",
+    "detail": "Subsubsection"
+  },
+  {
+    "label": "\\paragraph",
+    "insert": "\\paragraph{$1}$0",
+    "detail": "Paragraph"
+  },
+  {
+    "label": "\\label",
+    "insert": "\\label{$1}$0",
+    "detail": "Label"
+  },
+  {
+    "label": "\\ref",
+    "insert": "\\ref{$1}$0",
+    "detail": "Reference"
+  },
+  {
+    "label": "\\eqref",
+    "insert": "\\eqref{$1}$0",
+    "detail": "Equation ref"
+  },
+  {
+    "label": "\\cite",
+    "insert": "\\cite{$1}$0",
+    "detail": "Citation"
+  },
+  {
+    "label": "\\footnote",
+    "insert": "\\footnote{$1}$0",
+    "detail": "Footnote"
+  },
+  {
+    "label": "\\maketitle",
+    "insert": "\\maketitle$0",
+    "detail": "Make title"
+  },
+  {
+    "label": "\\tableofcontents",
+    "insert": "\\tableofcontents$0",
+    "detail": "Table of contents"
+  },
+  {
+    "label": "\\bibliography",
+    "insert": "\\bibliography{$1}$0",
+    "detail": "Bibliography"
+  },
+  {
+    "label": "\\bibliographystyle",
+    "insert": "\\bibliographystyle{$1}$0",
+    "detail": "Bib style"
+  },
+  {
+    "label": "\\frac",
+    "insert": "\\frac{$1}{$2}$0",
+    "detail": "Fraction"
+  },
+  {
+    "label": "\\sqrt",
+    "insert": "\\sqrt{$1}$0",
+    "detail": "Square root"
+  },
+  {
+    "label": "\\sum",
+    "insert": "\\sum_{$1}^{$2}$0",
+    "detail": "Sum"
+  },
+  {
+    "label": "\\prod",
+    "insert": "\\prod_{$1}^{$2}$0",
+    "detail": "Product"
+  },
+  {
+    "label": "\\int",
+    "insert": "\\int_{$1}^{$2}$0",
+    "detail": "Integral"
+  },
+  {
+    "label": "\\oint",
+    "insert": "\\oint$0",
+    "detail": "Contour integral"
+  },
+  {
+    "label": "\\lim",
+    "insert": "\\lim_{$1 \\to $2}$0",
+    "detail": "Limit"
+  },
+  {
+    "label": "\\infty",
+    "insert": "\\infty$0",
+    "detail": "∞"
+  },
+  {
+    "label": "\\partial",
+    "insert": "\\partial$0",
+    "detail": "∂"
+  },
+  {
+    "label": "\\nabla",
+    "insert": "\\nabla$0",
+    "detail": "∇"
+  },
+  {
+    "label": "\\cdot",
+    "insert": "\\cdot$0",
+    "detail": "·"
+  },
+  {
+    "label": "\\cdots",
+    "insert": "\\cdots$0",
+    "detail": "⋯"
+  },
+  {
+    "label": "\\ldots",
+    "insert": "\\ldots$0",
+    "detail": "…"
+  },
+  {
+    "label": "\\times",
+    "insert": "\\times$0",
+    "detail": "×"
+  },
+  {
+    "label": "\\div",
+    "insert": "\\div$0",
+    "detail": "÷"
+  },
+  {
+    "label": "\\pm",
+    "insert": "\\pm$0",
+    "detail": "±"
+  },
+  {
+    "label": "\\leq",
+    "insert": "\\leq$0",
+    "detail": "≤"
+  },
+  {
+    "label": "\\geq",
+    "insert": "\\geq$0",
+    "detail": "≥"
+  },
+  {
+    "label": "\\neq",
+    "insert": "\\neq$0",
+    "detail": "≠"
+  },
+  {
+    "label": "\\approx",
+    "insert": "\\approx$0",
+    "detail": "≈"
+  },
+  {
+    "label": "\\equiv",
+    "insert": "\\equiv$0",
+    "detail": "≡"
+  },
+  {
+    "label": "\\in",
+    "insert": "\\in$0",
+    "detail": "∈"
+  },
+  {
+    "label": "\\notin",
+    "insert": "\\notin$0",
+    "detail": "∉"
+  },
+  {
+    "label": "\\subset",
+    "insert": "\\subset$0",
+    "detail": "⊂"
+  },
+  {
+    "label": "\\subseteq",
+    "insert": "\\subseteq$0",
+    "detail": "⊆"
+  },
+  {
+    "label": "\\cup",
+    "insert": "\\cup$0",
+    "detail": "∪"
+  },
+  {
+    "label": "\\cap",
+    "insert": "\\cap$0",
+    "detail": "∩"
+  },
+  {
+    "label": "\\forall",
+    "insert": "\\forall$0",
+    "detail": "∀"
+  },
+  {
+    "label": "\\exists",
+    "insert": "\\exists$0",
+    "detail": "∃"
+  },
+  {
+    "label": "\\neg",
+    "insert": "\\neg$0",
+    "detail": "¬"
+  },
+  {
+    "label": "\\land",
+    "insert": "\\land$0",
+    "detail": "∧"
+  },
+  {
+    "label": "\\lor",
+    "insert": "\\lor$0",
+    "detail": "∨"
+  },
+  {
+    "label": "\\rightarrow",
+    "insert": "\\rightarrow$0",
+    "detail": "→"
+  },
+  {
+    "label": "\\leftarrow",
+    "insert": "\\leftarrow$0",
+    "detail": "←"
+  },
+  {
+    "label": "\\Rightarrow",
+    "insert": "\\Rightarrow$0",
+    "detail": "⇒"
+  },
+  {
+    "label": "\\Leftrightarrow",
+    "insert": "\\Leftrightarrow$0",
+    "detail": "⇔"
+  },
+  {
+    "label": "\\to",
+    "insert": "\\to$0",
+    "detail": "→ (short)"
+  },
+  {
+    "label": "\\overline",
+    "insert": "\\overline{$1}$0",
+    "detail": "Overline"
+  },
+  {
+    "label": "\\hat",
+    "insert": "\\hat{$1}$0",
+    "detail": "Hat"
+  },
+  {
+    "label": "\\vec",
+    "insert": "\\vec{$1}$0",
+    "detail": "Vector"
+  },
+  {
+    "label": "\\bar",
+    "insert": "\\bar{$1}$0",
+    "detail": "Bar"
+  },
+  {
+    "label": "\\tilde",
+    "insert": "\\tilde{$1}$0",
+    "detail": "Tilde"
+  },
+  {
+    "label": "\\dot",
+    "insert": "\\dot{$1}$0",
+    "detail": "Dot"
+  },
+  {
+    "label": "\\ddot",
+    "insert": "\\ddot{$1}$0",
+    "detail": "Double dot"
+  },
+  {
+    "label": "\\mathbf",
+    "insert": "\\mathbf{$1}$0",
+    "detail": "Math bold"
+  },
+  {
+    "label": "\\mathit",
+    "insert": "\\mathit{$1}$0",
+    "detail": "Math italic"
+  },
+  {
+    "label": "\\mathrm",
+    "insert": "\\mathrm{$1}$0",
+    "detail": "Math roman"
+  },
+  {
+    "label": "\\mathbb",
+    "insert": "\\mathbb{$1}$0",
+    "detail": "Blackboard bold"
+  },
+  {
+    "label": "\\mathcal",
+    "insert": "\\mathcal{$1}$0",
+    "detail": "Calligraphy"
+  },
+  {
+    "label": "\\alpha",
+    "insert": "\\alpha$0",
+    "detail": "α"
+  },
+  {
+    "label": "\\beta",
+    "insert": "\\beta$0",
+    "detail": "β"
+  },
+  {
+    "label": "\\gamma",
+    "insert": "\\gamma$0",
+    "detail": "γ"
+  },
+  {
+    "label": "\\Gamma",
+    "insert": "\\Gamma$0",
+    "detail": "Γ"
+  },
+  {
+    "label": "\\delta",
+    "insert": "\\delta$0",
+    "detail": "δ"
+  },
+  {
+    "label": "\\Delta",
+    "insert": "\\Delta$0",
+    "detail": "Δ"
+  },
+  {
+    "label": "\\epsilon",
+    "insert": "\\epsilon$0",
+    "detail": "ε"
+  },
+  {
+    "label": "\\varepsilon",
+    "insert": "\\varepsilon$0",
+    "detail": "ε (var)"
+  },
+  {
+    "label": "\\zeta",
+    "insert": "\\zeta$0",
+    "detail": "ζ"
+  },
+  {
+    "label": "\\eta",
+    "insert": "\\eta$0",
+    "detail": "η"
+  },
+  {
+    "label": "\\theta",
+    "insert": "\\theta$0",
+    "detail": "θ"
+  },
+  {
+    "label": "\\Theta",
+    "insert": "\\Theta$0",
+    "detail": "Θ"
+  },
+  {
+    "label": "\\vartheta",
+    "insert": "\\vartheta$0",
+    "detail": "θ (var)"
+  },
+  {
+    "label": "\\iota",
+    "insert": "\\iota$0",
+    "detail": "ι"
+  },
+  {
+    "label": "\\kappa",
+    "insert": "\\kappa$0",
+    "detail": "κ"
+  },
+  {
+    "label": "\\lambda",
+    "insert": "\\lambda$0",
+    "detail": "λ"
+  },
+  {
+    "label": "\\Lambda",
+    "insert": "\\Lambda$0",
+    "detail": "Λ"
+  },
+  {
+    "label": "\\mu",
+    "insert": "\\mu$0",
+    "detail": "μ"
+  },
+  {
+    "label": "\\nu",
+    "insert": "\\nu$0",
+    "detail": "ν"
+  },
+  {
+    "label": "\\xi",
+    "insert": "\\xi$0",
+    "detail": "ξ"
+  },
+  {
+    "label": "\\pi",
+    "insert": "\\pi$0",
+    "detail": "π"
+  },
+  {
+    "label": "\\Pi",
+    "insert": "\\Pi$0",
+    "detail": "Π"
+  },
+  {
+    "label": "\\rho",
+    "insert": "\\rho$0",
+    "detail": "ρ"
+  },
+  {
+    "label": "\\sigma",
+    "insert": "\\sigma$0",
+    "detail": "σ"
+  },
+  {
+    "label": "\\Sigma",
+    "insert": "\\Sigma$0",
+    "detail": "Σ"
+  },
+  {
+    "label": "\\tau",
+    "insert": "\\tau$0",
+    "detail": "τ"
+  },
+  {
+    "label": "\\upsilon",
+    "insert": "\\upsilon$0",
+    "detail": "υ"
+  },
+  {
+    "label": "\\phi",
+    "insert": "\\phi$0",
+    "detail": "φ"
+  },
+  {
+    "label": "\\Phi",
+    "insert": "\\Phi$0",
+    "detail": "Φ"
+  },
+  {
+    "label": "\\varphi",
+    "insert": "\\varphi$0",
+    "detail": "φ (var)"
+  },
+  {
+    "label": "\\chi",
+    "insert": "\\chi$0",
+    "detail": "χ"
+  },
+  {
+    "label": "\\psi",
+    "insert": "\\psi$0",
+    "detail": "ψ"
+  },
+  {
+    "label": "\\Psi",
+    "insert": "\\Psi$0",
+    "detail": "Ψ"
+  },
+  {
+    "label": "\\omega",
+    "insert": "\\omega$0",
+    "detail": "ω"
+  },
+  {
+    "label": "\\Omega",
+    "insert": "\\Omega$0",
+    "detail": "Ω"
+  },
+  {
+    "label": "\\begin",
+    "insert": "\\begin{$1}\n  $0\n\\end{$1}",
+    "detail": "Begin environment"
+  },
+  {
+    "label": "\\documentclass",
+    "insert": "\\documentclass{$1}$0",
+    "detail": "Document class"
+  },
+  {
+    "label": "\\usepackage",
+    "insert": "\\usepackage{$1}$0",
+    "detail": "Package"
+  },
+  {
+    "label": "\\newcommand",
+    "insert": "\\newcommand{\\$1}[$2]{$3}$0",
+    "detail": "New command"
+  },
+  {
+    "label": "\\renewcommand",
+    "insert": "\\renewcommand{\\$1}[$2]{$3}$0",
+    "detail": "Renew command"
+  },
+  {
+    "label": "\\newenvironment",
+    "insert": "\\newenvironment{$1}{$2}{$3}$0",
+    "detail": "New environment"
+  },
+  {
+    "label": "\\item",
+    "insert": "\\item $0",
+    "detail": "List item"
+  },
+  {
+    "label": "\\includegraphics",
+    "insert": "\\includegraphics[width=$1]{$2}$0",
+    "detail": "Include image"
+  },
+  {
+    "label": "\\caption",
+    "insert": "\\caption{$1}$0",
+    "detail": "Caption"
+  },
+  {
+    "label": "\\hline",
+    "insert": "\\hline$0",
+    "detail": "Horizontal rule"
+  },
+  {
+    "label": "\\cline",
+    "insert": "\\cline{$1-$2}$0",
+    "detail": "Partial rule"
+  },
+  {
+    "label": "\\hspace",
+    "insert": "\\hspace{$1}$0",
+    "detail": "Horiz space"
+  },
+  {
+    "label": "\\vspace",
+    "insert": "\\vspace{$1}$0",
+    "detail": "Vert space"
+  },
+  {
+    "label": "\\noindent",
+    "insert": "\\noindent$0",
+    "detail": "No indent"
+  },
+  {
+    "label": "\\centering",
+    "insert": "\\centering$0",
+    "detail": "Center"
+  },
+  {
+    "label": "\\linebreak",
+    "insert": "\\linebreak$0",
+    "detail": "Line break"
+  },
+  {
+    "label": "\\pagebreak",
+    "insert": "\\pagebreak$0",
+    "detail": "Page break"
+  },
+  {
+    "label": "\\newpage",
+    "insert": "\\newpage$0",
+    "detail": "New page"
+  },
+  {
+    "label": "\\clearpage",
+    "insert": "\\clearpage$0",
+    "detail": "Clear page"
+  },
+  {
+    "label": "\\par",
+    "insert": "\\par$0",
+    "detail": "Paragraph break"
+  }
+]

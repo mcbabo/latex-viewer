@@ -11,23 +11,23 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.972 0.013 75);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: oklch(0.978 0.010 75);
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: oklch(0.978 0.010 75);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.96 0.008 75);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.96 0.008 75);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.96 0.008 75);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.905 0.008 75);
+  --input: oklch(0.905 0.008 75);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
@@ -35,13 +35,13 @@
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(0.965 0.015 75);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: oklch(0.96 0.008 75);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-border: oklch(0.905 0.008 75);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
@@ -80,7 +80,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-sans: "Geist Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -131,4 +131,61 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Restore pointer events for interactive elements inside drag regions */
+[data-tauri-drag-region] button,
+[data-tauri-drag-region] input,
+[data-tauri-drag-region] a,
+[data-tauri-drag-region] select,
+[data-tauri-drag-region] [role="button"],
+[data-tauri-drag-region] [role="tab"],
+[data-tauri-drag-region] [role="radio"] {
+  -webkit-app-region: no-drag;
+}
+
+/* tauri-plugin-decorum injected window controls */
+/* Plugin uses inline styles (height: 32px, width: 58px) so !important is required */
+div[data-tauri-decorum-tb] {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: auto !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: stretch !important;
+  z-index: 9999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+button.decorum-tb-btn {
+  pointer-events: auto !important;
+  width: 46px !important;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--muted-foreground) !important;
+  font-size: 11px !important;
+  transition:
+    background 0.1s,
+    color 0.1s;
+  -webkit-app-region: no-drag;
+}
+
+button.decorum-tb-btn:hover {
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+
+button#decorum-tb-close:hover {
+  background: var(--destructive) !important;
+  color: #fff !important;
 }
